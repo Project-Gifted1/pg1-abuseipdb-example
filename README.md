@@ -105,26 +105,28 @@ proof the address is harmless; `no_flags` only means nothing was flagged.
 
 ## Example responses
 
-Trimmed. Field values come from AbuseIPDB at the time of the lookup, so yours
-will differ.
+Real results from live MCP `tools/call` requests (the same request as
+`examples/curl.sh`, with `max_age_in_days` 90), **snapshot from 7 Oct 2026;
+values change as new reports arrive.** Trimmed to the main fields: the full
+result also has `ip_version`, `max_age_in_days`, `cached`, `checks` and
+`request_id`.
 
 **8.8.8.8: whitelisted, score 0 → `no_flags`**
 
 ```json
 {
   "ip": "8.8.8.8",
-  "ip_version": 4,
-  "max_age_in_days": 90,
+  "status": "no_flags",
   "abuse_confidence_score": 0,
   "total_reports": 226,
-  "distinct_reporters": 61,
+  "distinct_reporters": 90,
+  "last_reported_at": "2026-10-06T21:32:34.000Z",
   "country_code": "US",
   "usage_type": "Content Delivery Network",
   "isp": "Google LLC",
   "domain": "google.com",
   "is_tor": false,
   "is_whitelisted": true,
-  "status": "no_flags",
   "reasons": [
     {
       "code": "IP_WHITELISTED",
@@ -132,41 +134,50 @@ will differ.
     }
   ],
   "note": "abuse_confidence_score is AbuseIPDB's 0-100 confidence that the address is abusive. A score of 0 is not proof the address is harmless.",
-  "attribution": { "text": "Data from AbuseIPDB", "url": "https://www.abuseipdb.com/check/8.8.8.8" }
+  "attribution": {
+    "text": "Data from AbuseIPDB",
+    "url": "https://www.abuseipdb.com/check/8.8.8.8"
+  }
 }
 ```
 
-**A high-score address → `flagged`.** The address is left out here; any
-address AbuseIPDB currently scores highly looks like this.
+**116.179.32.142: score 95 → `flagged`**
 
 ```json
 {
-  "ip": "<ip>",
-  "ip_version": 4,
-  "max_age_in_days": 90,
-  "abuse_confidence_score": 100,
-  "total_reports": 1532,
-  "distinct_reporters": 412,
+  "ip": "116.179.32.142",
+  "status": "flagged",
+  "abuse_confidence_score": 95,
+  "total_reports": 239,
+  "distinct_reporters": 32,
+  "last_reported_at": "2026-10-07T11:46:06.000Z",
+  "country_code": "CN",
+  "usage_type": "Fixed Line ISP",
+  "isp": "China United Network Communications Corporation Limited",
+  "domain": "chinaunicom.cn",
   "is_tor": false,
   "is_whitelisted": false,
-  "status": "flagged",
   "reasons": [
     {
       "code": "IP_ABUSE_REPORTED",
-      "message": "IP address has an abuse confidence score of 100, from 1532 abuse report(s) by 412 distinct reporter(s) in the last 90 day(s)."
+      "message": "IP address has an abuse confidence score of 95, from 239 abuse report(s) by 32 distinct reporter(s) in the last 90 day(s)."
     }
   ],
-  "attribution": { "text": "Data from AbuseIPDB", "url": "https://www.abuseipdb.com/check/<ip>" }
+  "note": "abuse_confidence_score is AbuseIPDB's 0-100 confidence that the address is abusive. A score of 0 is not proof the address is harmless.",
+  "attribution": {
+    "text": "Data from AbuseIPDB",
+    "url": "https://www.abuseipdb.com/check/116.179.32.142"
+  }
 }
 ```
 
-What `node examples/check-ip.mjs 8.8.8.8` prints:
+For the 8.8.8.8 snapshot above, `node examples/check-ip.mjs 8.8.8.8` prints:
 
 ```text
 IP:       8.8.8.8
 Status:   no_flags
 Score:    0 / 100
-Reports:  226 from 61 reporter(s) in the last 90 day(s)
+Reports:  226 from 90 reporter(s) in the last 90 day(s)
 Reasons:
   - IP_WHITELISTED: AbuseIPDB marks this address as whitelisted; it has 226 report(s) in the last 90 day(s), which AbuseIPDB does not count against it.
 Note:     abuse_confidence_score is AbuseIPDB's 0-100 confidence that the address is abusive. A score of 0 is not proof the address is harmless.
@@ -216,7 +227,7 @@ PG1.
 
 ## How this was made
 
-Built with AI coding tooling, tested live.
+Built with AI coding tooling. The MCP request in examples/curl.sh was tested live against PG1 on 7 October 2026. The Node script is tested offline against stubbed responses in CI.
 
 ## License
 
