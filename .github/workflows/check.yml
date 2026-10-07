@@ -1,0 +1,26 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # Offline only: no AbuseIPDB key is configured, and the tests never call
+      # AbuseIPDB or PG1.
+      - name: Argument parsing tests
+        run: node --test test/check-ip.test.mjs
+      - name: Shell syntax check
+        run: bash -n examples/curl.sh

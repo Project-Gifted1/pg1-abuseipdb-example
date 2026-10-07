@@ -1,0 +1,7 @@
+# Secrets: your AbuseIPDB key lives here and must never be committed.
+.env
+.env.*
+!.env.example
+
+node_modules/
+.DS_Store
